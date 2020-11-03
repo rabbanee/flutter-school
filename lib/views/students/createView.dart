@@ -48,7 +48,10 @@ class _CreateState extends State<Create> {
     setState(() {
       loading = false;
     });
-    return response ? 'Success' : 'Failed to create student';
+    print('response: $response');
+    return response
+        ? 'Success to create a student'
+        : 'Failed to create a student';
   }
 
   @override

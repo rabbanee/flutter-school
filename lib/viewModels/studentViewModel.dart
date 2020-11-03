@@ -37,9 +37,8 @@ Future createStudent(String nisn, String name, String email, String phoneNumber,
         }));
     print('status code: ${result.statusCode}');
     if (result.statusCode == 200) {
-      print('Success add data');
-      final data = studentModelFromJson(result.body);
-      return data;
+      print('masuk');
+      return true;
     } else {
       print('Failed to add data ${result.body}');
       return false;
