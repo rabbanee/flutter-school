@@ -1,9 +1,9 @@
 part of 'viewModel.dart';
 
-Future getStudents() async {
+Future getStudents({page = 1}) async {
   try {
     http.Response result = await http.get(
-        Uri.parse('https://api-sekolah.herokuapp.com/api/students'),
+        Uri.parse('https://api-sekolah.herokuapp.com/api/students?page=$page'),
         headers: {"Accept": "application/json"});
 
     print('status code: ${result.statusCode}');
@@ -41,7 +41,7 @@ Future createStudent(String nisn, String name, String email, String phoneNumber,
       final data = studentModelFromJson(result.body);
       return data;
     } else {
-      print('Failed to add data $result');
+      print('Failed to add data ${result.body}');
       return false;
     }
   } catch (e) {

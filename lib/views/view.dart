@@ -1,3 +1,4 @@
+import 'package:school/models/model.dart';
 import 'package:school/viewModels/viewModel.dart';
 import 'package:flutter/material.dart';
 

@@ -1,22 +1,44 @@
 part of 'model.dart';
 
-List<StudentModel> studentModelFromJson(String str) => List<StudentModel>.from(
-    json.decode(str).map((x) => StudentModel.fromJson(x)));
+StudentModel studentModelFromJson(String str) =>
+    StudentModel.fromJson(json.decode(str));
 
-String studentModelToJson(List<StudentModel> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String studentModelToJson(StudentModel data) => json.encode(data.toJson());
 
 class StudentModel {
   StudentModel({
+    this.data,
+    this.links,
+    this.meta,
+  });
+
+  List<Datum> data;
+  Links links;
+  Meta meta;
+
+  factory StudentModel.fromJson(Map<String, dynamic> json) => StudentModel(
+        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+        links: Links.fromJson(json["links"]),
+        meta: Meta.fromJson(json["meta"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+        "links": links.toJson(),
+        "meta": meta.toJson(),
+      };
+}
+
+class Datum {
+  Datum({
     this.nisn,
     this.name,
     this.email,
     this.phoneNumber,
     this.address,
     this.gender,
-    this.gradeId,
-    this.createdAt,
-    this.updatedAt,
+    this.grade,
+    this.gradeSlug,
   });
 
   int nisn;
@@ -24,21 +46,19 @@ class StudentModel {
   String email;
   String phoneNumber;
   String address;
-  Gender gender;
-  int gradeId;
-  DateTime createdAt;
-  DateTime updatedAt;
+  String gender;
+  String grade;
+  String gradeSlug;
 
-  factory StudentModel.fromJson(Map<String, dynamic> json) => StudentModel(
+  factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         nisn: json["nisn"],
         name: json["name"],
         email: json["email"],
         phoneNumber: json["phone_number"],
         address: json["address"],
-        gender: genderValues.map[json["gender"]],
-        gradeId: json["grade_id"],
-        createdAt: DateTime.parse(json["created_at"]),
-        updatedAt: DateTime.parse(json["updated_at"]),
+        gender: json["gender"],
+        grade: json["grade"],
+        gradeSlug: json["grade_slug"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -47,27 +67,104 @@ class StudentModel {
         "email": email,
         "phone_number": phoneNumber,
         "address": address,
-        "gender": genderValues.reverse[gender],
-        "grade_id": gradeId,
-        "created_at": createdAt.toIso8601String(),
-        "updated_at": updatedAt.toIso8601String(),
+        "gender": gender,
+        "grade": grade,
+        "grade_slug": gradeSlug,
       };
 }
 
-enum Gender { MALE, FEMALE }
+class Links {
+  Links({
+    this.first,
+    this.last,
+    this.prev,
+    this.next,
+  });
 
-final genderValues = EnumValues({"Female": Gender.FEMALE, "Male": Gender.MALE});
+  String first;
+  String last;
+  dynamic prev;
+  String next;
 
-class EnumValues<T> {
-  Map<String, T> map;
-  Map<T, String> reverseMap;
+  factory Links.fromJson(Map<String, dynamic> json) => Links(
+        first: json["first"],
+        last: json["last"],
+        prev: json["prev"],
+        next: json["next"],
+      );
 
-  EnumValues(this.map);
+  Map<String, dynamic> toJson() => {
+        "first": first,
+        "last": last,
+        "prev": prev,
+        "next": next,
+      };
+}
 
-  Map<T, String> get reverse {
-    if (reverseMap == null) {
-      reverseMap = map.map((k, v) => new MapEntry(v, k));
-    }
-    return reverseMap;
-  }
+class Meta {
+  Meta({
+    this.currentPage,
+    this.from,
+    this.lastPage,
+    this.links,
+    this.path,
+    this.perPage,
+    this.to,
+    this.total,
+  });
+
+  int currentPage;
+  int from;
+  int lastPage;
+  List<Link> links;
+  String path;
+  int perPage;
+  int to;
+  int total;
+
+  factory Meta.fromJson(Map<String, dynamic> json) => Meta(
+        currentPage: json["current_page"],
+        from: json["from"],
+        lastPage: json["last_page"],
+        links: List<Link>.from(json["links"].map((x) => Link.fromJson(x))),
+        path: json["path"],
+        perPage: json["per_page"],
+        to: json["to"],
+        total: json["total"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "current_page": currentPage,
+        "from": from,
+        "last_page": lastPage,
+        "links": List<dynamic>.from(links.map((x) => x.toJson())),
+        "path": path,
+        "per_page": perPage,
+        "to": to,
+        "total": total,
+      };
+}
+
+class Link {
+  Link({
+    this.url,
+    this.label,
+    this.active,
+  });
+
+  String url;
+  dynamic label;
+  bool active;
+
+  factory Link.fromJson(Map<String, dynamic> json) => Link(
+        url: json["url"] == null ? null : json["url"],
+        label: json["label"],
+        active: json["active"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "url": url == null ? null : url,
+        "label": label,
+        "active": active,
+      };
 }

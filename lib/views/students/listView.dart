@@ -6,16 +6,25 @@ class Students extends StatefulWidget {
 }
 
 class _StudentsState extends State<Students> {
-  List students;
+  StudentModel student;
+  List<Datum> data = [];
+  int currentPage = 1;
+  bool isLoading = false;
 
   get diretion => null;
 
-  Future getListStudent() async {
+  Future getListStudent({page = 1}) async {
     var result = await getStudents();
-    print('result: $result');
     setState(() {
-      students = result;
+      student = result;
+      data.addAll(student.data);
+      currentPage = student.meta.currentPage;
     });
+
+    setState(() {
+      isLoading = false;
+    });
+    print('students: ${data[0].nisn}');
   }
 
   void initState() {
@@ -40,78 +49,99 @@ class _StudentsState extends State<Students> {
       ),
       body: Column(
         children: <Widget>[
-          students == null
-              ? Center(
-                  child: CircularProgressIndicator(),
+          student == null
+              ? Expanded(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 )
               : Expanded(
-                  child: ListView.builder(
-                    itemBuilder: (context, i) {
-                      return Dismissible(
-                        confirmDismiss: (direction) =>
-                            dismissibleAction(direction, context, students[i]),
-                        secondaryBackground: Container(
-                          color: Colors.red,
-                          child: Align(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                Icon(
-                                  Icons.delete,
-                                  color: Colors.white,
-                                ),
-                                Text(
-                                  " Delete",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                  textAlign: TextAlign.right,
-                                ),
-                                SizedBox(
-                                  width: 20,
-                                ),
-                              ],
-                            ),
-                            alignment: Alignment.centerRight,
-                          ),
-                        ),
-                        background: Container(
-                          color: Colors.green,
-                          child: Align(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                Icon(
-                                  Icons.edit,
-                                  color: Colors.white,
-                                ),
-                                Text(
-                                  "Edit",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ],
-                            ),
-                            alignment: Alignment.centerLeft,
-                          ),
-                        ),
-                        key: UniqueKey(),
-                        child: ListTile(
-                          title: Text(students[i].name),
-                          subtitle: Text('Grade id: ${students[i].gradeId}'),
-                        ),
-                      );
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (ScrollNotification scrollInfo) {
+                      if (!isLoading &&
+                          scrollInfo.metrics.pixels ==
+                              scrollInfo.metrics.maxScrollExtent) {
+                        getListStudent(page: currentPage + 1);
+                        setState(() {
+                          isLoading = true;
+                        });
+                      }
                     },
-                    itemCount: students.length,
+                    child: ListView.builder(
+                      itemBuilder: (context, i) {
+                        return Dismissible(
+                          confirmDismiss: (direction) =>
+                              dismissibleAction(direction, context, data[i]),
+                          secondaryBackground: Container(
+                            color: Colors.red,
+                            child: Align(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                  Text(
+                                    " Delete",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    textAlign: TextAlign.right,
+                                  ),
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                ],
+                              ),
+                              alignment: Alignment.centerRight,
+                            ),
+                          ),
+                          background: Container(
+                            color: Colors.green,
+                            child: Align(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                  Icon(
+                                    Icons.edit,
+                                    color: Colors.white,
+                                  ),
+                                  Text(
+                                    " Edit",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ],
+                              ),
+                              alignment: Alignment.centerLeft,
+                            ),
+                          ),
+                          key: UniqueKey(),
+                          child: ListTile(
+                            title: Text(data[i].name),
+                            subtitle: Text('Grade: ${data[i].grade}'),
+                          ),
+                        );
+                      },
+                      itemCount: data.length,
+                    ),
                   ),
                 ),
+          Container(
+            height: isLoading ? 50.0 : 0,
+            color: Colors.transparent,
+            child: Center(
+              child: new CircularProgressIndicator(),
+            ),
+          ),
         ],
       ),
     );
