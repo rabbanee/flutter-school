@@ -1,0 +1,51 @@
+part of 'viewModel.dart';
+
+Future getStudents() async {
+  try {
+    http.Response result = await http.get(
+        Uri.parse('https://api-sekolah.herokuapp.com/api/students'),
+        headers: {"Accept": "application/json"});
+
+    print('status code: ${result.statusCode}');
+    if (result.statusCode == 200) {
+      print('Success get data');
+      final data = studentModelFromJson(result.body);
+      return data;
+    } else {
+      print('Failed to get data');
+      return null;
+    }
+  } catch (e) {
+    print('Error: $e');
+    return null;
+  }
+}
+
+Future createStudent(String nisn, String name, String email, String phoneNumber,
+    String address, String gender, String gradeId) async {
+  try {
+    var url = 'https://api-sekolah.herokuapp.com/api/students';
+    var result = await http.post(url,
+        body: ({
+          'nisn': nisn,
+          'name': name,
+          'email': email,
+          'phone_number': phoneNumber,
+          'address': address,
+          'gender': gender,
+          'grade_id': gradeId,
+        }));
+    print('status code: ${result.statusCode}');
+    if (result.statusCode == 200) {
+      print('Success add data');
+      final data = studentModelFromJson(result.body);
+      return data;
+    } else {
+      print('Failed to add data $result');
+      return false;
+    }
+  } catch (e) {
+    print('Error: $e');
+    return false;
+  }
+}
